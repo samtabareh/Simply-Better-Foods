@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 
 namespace SimplyBetterFoodsNS
 {
@@ -52,19 +53,20 @@ namespace SimplyBetterFoodsNS
             FoodEffect.EffectTimer = EffectTimer;
         }
         private static bool PermEffectb = false;
-        /// <summary>
-        /// Only uses Health Damage and Defence args.
-        /// </summary>
-        /// <param name="want">Set it a value if you want a FoodEffects return.</param>
-        internal static FoodEffects PermEffect(bool want)
+
+        [HarmonyPatch(typeof(EndOfMonthCutscenes), "FeedVillagers")]
+        private static void Prefix()
         {
-            PermEffectb = PermEffectb ? false : true;
-            return FoodEffects.PermEffect;
+            PermEffectb = true;
+            Debug.LogWarning("Set bool true");
         }
-        internal static void PermEffect()
+        [HarmonyPatch(typeof(EndOfMonthCutscenes), "FeedVillagers")]
+        private static void Postfix()
         {
-            PermEffectb = PermEffectb ? false : true;
+            PermEffectb = true;
+            Debug.LogWarning("Set bool false");
         }
+
         [HarmonyPatch(typeof(Combatable))]
         [HarmonyPatch(nameof(Combatable.ProcessedCombatStats), MethodType.Getter)]
         [HarmonyPostfix]
@@ -78,7 +80,15 @@ namespace SimplyBetterFoodsNS
             stats.Defence = Defence;
             stats.SpecialHits = new List<SpecialHit>();
             if (PermEffectb)
+            {
                 __result.AddStats(stats);
+                Debug.LogWarning("Added stats to ProcessedCombatStats result.");
+                Debug.LogWarning($"Health: {Health}");
+                Debug.LogWarning($"Damage: {Damage}");
+                Debug.LogWarning($"Defence: {Defence}");
+                PermEffectb = false;
+                Debug.LogWarning($"Set PermEffectb to {PermEffectb}");
+            }
         }
         public static void WellFed(Combatable Vill)
         {

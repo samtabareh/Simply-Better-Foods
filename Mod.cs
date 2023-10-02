@@ -1,6 +1,5 @@
 ﻿using HarmonyLib;
 using UnityEngine;
-using static SimplyBetterFoodsNS.FoodEffect;
 
 namespace SimplyBetterFoodsNS
 {
@@ -16,20 +15,23 @@ namespace SimplyBetterFoodsNS
         }
         [HarmonyPatch(typeof(Food), "ConsumedBy")]
         [HarmonyPostfix]
-        public static void Food__ConsumedBy_Postfix(Combatable vill, string ___Id)
+        public static void Food__ConsumedBy_Postfix(object[] __args, string ___Id)
         {
-            Debug.LogWarning($"{simply.Manifest.Name} Consume Patch Applied.");
-            for (int i = 0; i < FoodToEffects.Count; i++)
-                if (___Id == FoodToEffects[i].Id)
+            Debug.LogError("Started Consume");
+            for (int i = 0; i < FoodToEffects.Count; i++) {
+                Debug.LogError("Started For loop");
+                if (___Id == FoodToEffects[i].Id) {
+                    Debug.LogError("Started If code");
                     switch (FoodToEffects[i].FoodEffects)
                     {
                         case FoodEffects.PermEffect:
-                            FoodEffect.PermEffect();
                             break;
                         case FoodEffects.WellFed:
-                            FoodEffect.WellFed(vill);
+                            FoodEffect.WellFed((Combatable)__args[0]);
                             break;
                     }
+                }
+            }
         }
 
         private void Awake()
@@ -39,7 +41,7 @@ namespace SimplyBetterFoodsNS
         }
         public override void Ready()
         {
-            AddFoodEffect(new FoodToEffect(FoodEffect.PermEffect(true), new FoodEffect(1), "apple"));
+            AddFoodEffect(new FoodToEffect(FoodEffects.PermEffect, new FoodEffect(1), "apple"));
         }
     }
 }
