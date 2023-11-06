@@ -1,6 +1,4 @@
-﻿using static SimplyBetterFoodsNS.FoodEffect;
-
-namespace SimplyBetterFoodsNS
+﻿namespace SimplyBetterFoodsNS
 {
     public struct FoodToEffect
     {
